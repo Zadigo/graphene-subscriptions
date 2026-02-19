@@ -58,3 +58,8 @@ tox = "^4.40.0"
 requires = ["poetry>=2.3.0"]
 build-backend = "poetry.masonry.api"
 # build-backend = "setuptools.build_meta"
+
+[tool.pyright]
+typeCheckingMode = "off"
+extraPaths = ["./graphene_subscriptions"]
+reportMissingImports = true

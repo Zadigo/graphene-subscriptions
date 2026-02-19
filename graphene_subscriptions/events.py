@@ -3,7 +3,6 @@ from typing import Optional
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from django.core.serializers import deserialize
 from django.db.models import Model
 from django.utils.module_loading import import_string
 
@@ -18,20 +17,20 @@ class EventNames(enum.Enum):
 class BaseEvent:
     def __init__(self, operation: Optional[str] = None, instance: Optional[Model | str] = None):
         self.operation = operation
-        self.instance: Optional[Model] = instance
+        self.instance: Optional[Model | str] = instance
 
-        if instance is not None and type(instance) == str:
-            self.instance = deserialize('json', instance)[0].object
+        # if instance is not None and type(instance) == str:
+        #     self.instance = deserialize('json', instance)[0].object
 
         if not isinstance(self.instance, Model):
             raise ValueError('BaseEvent instance value must be a Django model')
 
     @classmethod
-    def from_dict(cls, dict: dict[str, str]) -> "BaseEvent":
-        module_name, class_name = dict.get('__class__')
+    def from_dict(cls, values: dict[str, str]) -> "BaseEvent":
+        module_name, class_name = values.get('__class__')
         module = import_string(f"{module_name}.{class_name}")
         klass = getattr(module, class_name)
-        return cls(operation=dict.get('operation'), instance=klass)
+        return cls(operation=values.get('operation'), instance=klass)
 
     def send(self):
         channel_layer = get_channel_layer()

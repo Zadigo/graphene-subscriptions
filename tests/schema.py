@@ -1,6 +1,4 @@
 import graphene
-import reactivex
-from django.db import models
 from graphene_django.types import DjangoObjectType
 from reactivex import Subject, operators
 
@@ -55,11 +53,15 @@ class Subscription(TestModelCreateSubscription, TestModelDeletedSubscription, Cu
     hello = graphene.String()
 
     def resolve_hello(root, info):
-        return reactivex.of('Hello World!')
+        # return reactivex.of('Hello World!')
+        return 'Hello World!'
 
 
 class Query(graphene.ObjectType):
     base = graphene.String()
+
+    def resolve_base(root, info):
+        return None
 
 
 schema = graphene.Schema(query=Query, subscription=Subscription)

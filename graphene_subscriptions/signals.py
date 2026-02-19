@@ -1,5 +1,4 @@
-from django.db.models.signals import post_save, post_delete
-from graphene_subscriptions.events import ModelSubscriptionEvent, EventNames
+from graphene_subscriptions.events import EventNames, ModelSubscriptionEvent
 
 
 def post_save_subscription(sender, instance, created, **kwargs):
@@ -15,4 +14,6 @@ def post_delete_subscription(sender, instance, **kwargs):
     event = ModelSubscriptionEvent(
         operation=EventNames.DELETED.value, instance=instance
     )
+    event.send()
+    event.send()
     event.send()
