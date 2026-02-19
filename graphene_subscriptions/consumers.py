@@ -34,7 +34,7 @@ class GraphqlSubscriptionConsumer(SyncConsumer):
             except json.JSONDecodeError:
                 return text_data
 
-    def _send_result(self, id: str, result):
+    def _send_result(self, id: str, result: graphql.ExecutionResult):
         errors = result.errors
 
         self.send(

@@ -18,7 +18,7 @@ class EventNames(enum.Enum):
 class BaseEvent:
     def __init__(self, operation: Optional[str] = None, instance: Optional[Model | str] = None):
         self.operation = operation
-        self.instance: Optional[Model] = None
+        self.instance: Optional[Model] = instance
 
         if instance is not None and type(instance) == str:
             self.instance = deserialize('json', instance)[0].object
@@ -62,5 +62,7 @@ class ModelSubscriptionEvent(BaseEvent):
             raise ValueError(
                 'ModelSubscriptionEvent instance value cannot be None'
             )
-        data['instance'] = self.instance.serialize()
+        data['instance'] = {
+            k: v for k, v in self.instance.__dict__.items() if not k.startswith('_')
+        }
         return data

@@ -16,8 +16,12 @@
             alt="follow on Twitter"></a>
 </p>
 
-A plug-and-play GraphQL subscription implementation for Graphene + Django built using Django Channels. Provides support for model creation, mutation and deletion subscriptions out of the box.
+A GraphQL subscription implementation for Graphene + Django built using Django Channels. Provides support for model creation, mutation and deletion subscriptions out of the box.
 
+
+## Description
+
+Graphene Subscriptions is a library for implementing GraphQL subscriptions in Graphene + Django projects. In other words, it allows you receive real-time updates from your GraphQL API whenever certain events occur in your Django app.
 
 ## Installation
 
@@ -29,9 +33,7 @@ A plug-and-play GraphQL subscription implementation for Graphene + Django built 
 2. Add `graphene_subscriptions` to `INSTALLED_APPS`:
 
     ```python
-    # your_project/settings.py
     INSTALLED_APPS = [
-        # ...
         'graphene_subscriptions'
     ]
     ```
@@ -39,7 +41,6 @@ A plug-and-play GraphQL subscription implementation for Graphene + Django built 
 3. Add Django Channels to your project (see: [Django Channels installation docs](https://channels.readthedocs.io/en/latest/installation.html)) and set up [Channel Layers](https://channels.readthedocs.io/en/latest/topics/channel_layers.html). If you don't want to set up a Redis instance in your dev environment yet, you can use the in-memory Channel Layer:
 
     ```python
-    # your_project/settings.py
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels.layers.InMemoryChannelLayer"
@@ -50,23 +51,21 @@ A plug-and-play GraphQL subscription implementation for Graphene + Django built 
 4. Add `GraphqlSubscriptionConsumer` to your `routing.py` file.
 
     ```python
-    # your_project/routing.py
+    from django.urls import path
     from channels.routing import ProtocolTypeRouter, URLRouter
-    from django.urls import path 
 
     from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
 
     application = ProtocolTypeRouter({
         "websocket": URLRouter([
             path('graphql/', GraphqlSubscriptionConsumer)
-        ]),
+        ])
     })
     ```
 
 5. Connect signals for any models you want to create subscriptions for
 
     ```python
-    # your_app/signals.py
     from django.db.models.signals import post_save, post_delete
     from graphene_subscriptions.signals import post_save_subscription, post_delete_subscription
 
@@ -75,7 +74,6 @@ A plug-and-play GraphQL subscription implementation for Graphene + Django built 
     post_save.connect(post_save_subscription, sender=YourModel, dispatch_uid="your_model_post_save")
     post_delete.connect(post_delete_subscription, sender=YourModel, dispatch_uid="your_model_post_delete")
 
-    # your_app/apps.py
     from django.apps import AppConfig
 
     class YourAppConfig(AppConfig):
@@ -88,9 +86,7 @@ A plug-and-play GraphQL subscription implementation for Graphene + Django built 
 6. Define your subscriptions and connect them to your project schema
 
     ```python
-    #your_project/schema.py
     import graphene
-
     from your_app.graphql.subscriptions import YourSubscription
 
 
@@ -117,19 +113,18 @@ A simple hello world subscription (which returns the value `"hello world!"` ever
 
 ```python
 import graphene
-from rx import Observable
+from reactivex import Observable
 
 class Subscription(graphene.ObjectType):
     hello = graphene.String()
 
     def resolve_hello(root, info):
-        return Observable.interval(3000) \
-                         .map(lambda i: "hello world!")
+        return Observable.interval(3000).map(lambda i: "hello world!")
 ```
 
 ## Responding to Model Events
 
-Each subscription that you define will receive a an `Observable` of `SubscriptionEvent`'s as the `root` parameter, which will emit a new `SubscriptionEvent` each time one of the connected signals are fired.
+Each subscription that you define will receive an `Observable` of `SubscriptionEvent`'s as the `root` parameter, which will emit a new `SubscriptionEvent` each time one of the connected signals are fired.
 
 A `SubscriptionEvent` has two attributes: the `operation` that triggered the event, usually `CREATED`, `UPDATED` or `DELETED`) and the `instance` that triggered the signal.
 

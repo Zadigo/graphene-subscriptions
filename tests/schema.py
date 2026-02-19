@@ -1,8 +1,9 @@
 import graphene
+import reactivex
 from django.db import models
 from graphene_django.types import DjangoObjectType
-from reactivex import Observable
-import reactivex
+from reactivex import Subject, operators
+
 from graphene_subscriptions.events import EventNames
 from tests.models import TestModel
 
@@ -13,19 +14,26 @@ class TestModelType(DjangoObjectType):
         fields = ['id', 'name']
 
 
-class TestModelSubscription(graphene.ObjectType):
+class TestModelCreateSubscription(graphene.ObjectType):
     test_model_created = graphene.Field(TestModelType)
 
-    def resolve_test_model_created(root, info):
-        return root.filter(
-            lambda event: (
-                event.operation == EventNames.CREATED.value
-                and isinstance(event.instance, TestModel)
+    def resolve_test_model_created(root: Subject, info):
+        composed = root.pipe(
+            operators.filter(
+                lambda event: (
+                    event.operation == EventNames.CREATED.value
+                    and isinstance(event.instance, TestModel)
+                )
             )
-        ).map(lambda event: event.instance)
+        ).pipe(
+            operators.map(
+                lambda event: event.instance
+            )
+        )
+        return composed.subscribe(print)
 
 
-class TestModelTypeDeletedSubscription(graphene.ObjectType):
+class TestModelDeletedSubscription(graphene.ObjectType):
     test_model_deleted = graphene.Field(TestModelType, id=graphene.ID())
 
     def resolve_test_model_deleted(root, info, id):
@@ -45,11 +53,11 @@ class CustomEventSubscription(graphene.ObjectType):
         ).map(lambda event: event.instance)
 
 
-class Subscription(TestModelSubscription, TestModelTypeDeletedSubscription, CustomEventSubscription):
+class Subscription(TestModelCreateSubscription, TestModelDeletedSubscription, CustomEventSubscription):
     hello = graphene.String()
 
     def resolve_hello(root, info):
-        return reactivex.of('Hello World!').pipe()
+        return reactivex.of('Hello World!').run()
 
 
 class Query(graphene.ObjectType):
