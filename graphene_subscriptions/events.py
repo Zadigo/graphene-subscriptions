@@ -12,6 +12,7 @@ class EventNames(enum.Enum):
     CREATED = 'created'
     UPDATED = 'updated'
     DELETED = 'deleted'
+    CUSTOM_EVENT = 'custom_event'
 
 
 class BaseEvent:

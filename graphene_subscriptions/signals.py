@@ -1,5 +1,5 @@
 from django.db.models.signals import post_save, post_delete
-from graphene_subcriptions.events import ModelSubscriptionEvent, EventNames
+from graphene_subscriptions.events import ModelSubscriptionEvent, EventNames
 
 
 def post_save_subscription(sender, instance, created, **kwargs):

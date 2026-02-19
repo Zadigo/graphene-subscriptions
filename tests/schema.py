@@ -1,71 +1,55 @@
 import graphene
+from django.db import models
 from graphene_django.types import DjangoObjectType
-from rx import Observable
-
-from _graphene_subscriptions.events import CREATED, UPDATED, DELETED
-
-from tests.models import SomeModel
-
-
-CUSTOM_EVENT = "custom_event"
+from reactivex import Observable
+import reactivex
+from graphene_subscriptions.events import EventNames
+from tests.models import TestModel
 
 
-class SomeModelType(DjangoObjectType):
+class TestModelType(DjangoObjectType):
     class Meta:
-        model = SomeModel
+        model = TestModel
+        fields = ['id', 'name']
 
 
-class SomeModelCreatedSubscription(graphene.ObjectType):
-    some_model_created = graphene.Field(SomeModelType)
+class TestModelSubscription(graphene.ObjectType):
+    test_model_created = graphene.Field(TestModelType)
 
-    def resolve_some_model_created(root, info):
+    def resolve_test_model_created(root, info):
         return root.filter(
-            lambda event: event.operation == CREATED
-            and isinstance(event.instance, SomeModel)
+            lambda event: (
+                event.operation == EventNames.CREATED.value
+                and isinstance(event.instance, TestModel)
+            )
         ).map(lambda event: event.instance)
 
 
-class SomeModelUpdatedSubscription(graphene.ObjectType):
-    some_model_updated = graphene.Field(SomeModelType, id=graphene.ID())
+class TestModelTypeDeletedSubscription(graphene.ObjectType):
+    test_model_deleted = graphene.Field(TestModelType, id=graphene.ID())
 
-    def resolve_some_model_updated(root, info, id):
+    def resolve_test_model_deleted(root, info, id):
         return root.filter(
-            lambda event: event.operation == UPDATED
-            and isinstance(event.instance, SomeModel)
-            and event.instance.pk == int(id)
-        ).map(lambda event: event.instance)
-
-
-class SomeModelDeletedSubscription(graphene.ObjectType):
-    some_model_deleted = graphene.Field(SomeModelType, id=graphene.ID())
-
-    def resolve_some_model_deleted(root, info, id):
-        return root.filter(
-            lambda event: event.operation == DELETED
-            and isinstance(event.instance, SomeModel)
+            lambda event: event.operation == EventNames.DELETED.value
+            and isinstance(event.instance, TestModel)
             and event.instance.pk == int(id)
         ).map(lambda event: event.instance)
 
 
 class CustomEventSubscription(graphene.ObjectType):
-    custom_subscription = graphene.String()
+    test_model_subscription = graphene.String()
 
-    def resolve_custom_subscription(root, info):
-        return root.filter(lambda event: event.operation == CUSTOM_EVENT).map(
-            lambda event: event.instance
-        )
+    def resolve_test_model_subscription(root, info):
+        return root.filter(
+            lambda event: event.operation == EventNames.CUSTOM_EVENT.value
+        ).map(lambda event: event.instance)
 
 
-class Subscription(
-    CustomEventSubscription,
-    SomeModelCreatedSubscription,
-    SomeModelUpdatedSubscription,
-    SomeModelDeletedSubscription,
-):
+class Subscription(TestModelSubscription, TestModelTypeDeletedSubscription, CustomEventSubscription):
     hello = graphene.String()
 
     def resolve_hello(root, info):
-        return Observable.of("hello world!")
+        return reactivex.of('Hello World!').pipe()
 
 
 class Query(graphene.ObjectType):
