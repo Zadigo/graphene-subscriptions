@@ -18,19 +18,17 @@ class TestModelCreateSubscription(graphene.ObjectType):
     test_model_created = graphene.Field(TestModelType)
 
     def resolve_test_model_created(root: Subject, info):
-        composed = root.pipe(
+        return root.pipe(
             operators.filter(
                 lambda event: (
                     event.operation == EventNames.CREATED.value
                     and isinstance(event.instance, TestModel)
                 )
-            )
-        ).pipe(
+            ),
             operators.map(
                 lambda event: event.instance
             )
         )
-        return composed.subscribe(print)
 
 
 class TestModelDeletedSubscription(graphene.ObjectType):
@@ -57,7 +55,7 @@ class Subscription(TestModelCreateSubscription, TestModelDeletedSubscription, Cu
     hello = graphene.String()
 
     def resolve_hello(root, info):
-        return reactivex.of('Hello World!').run()
+        return reactivex.of('Hello World!')
 
 
 class Query(graphene.ObjectType):
