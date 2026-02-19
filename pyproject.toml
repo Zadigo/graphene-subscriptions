@@ -1,31 +1,41 @@
-[tool.poetry]
+[project]
 name = "graphene_subscriptions"
-version = "1.0.2"
 description = "A plug-and-play GraphQL subscription implementation for Graphene + Django built using Django Channels."
-homepage = "https://github.com/jaydenwindle/graphene-subscriptions"
-repository = "https://github.com/jaydenwindle/graphene-subscriptions"
-authors = ["Jayden Windle <jaydenwindle@gmail.com>"]
-license = "MIT"
+version = "1.0.0-alpha.0"
+requires-python = ">=3.6"
 readme = "README.md"
+license = "MIT"
+keywords = ["graphql", "subscriptions", "django", "channels", "graphene"]
+authors = [
+    {name = "Jayden Windle", email = "jaydenwindle@gmail.com"},
+    {name = "John Pendenque", email = "pendenquejohn@gmail.com"}
+]
+maintainers = [
+    {name = "John Pendenque", email = "pendenquejohn@gmail.com"}
+]
 classifiers = [
     'Environment :: Web Environment',
     'Framework :: Django',
-    'Framework :: Django :: 1.11',
-    'Framework :: Django :: 2.1',
-    'Framework :: Django :: 2.2',
-    'Framework :: Django :: 3.0',
+    'Framework :: Django :: 5',
+    'Framework :: Django :: 6',
     'Intended Audience :: Developers',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.14',
+    'Programming Language :: Python :: 3.15',
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 ]
+
+[project.urls]
+homepage = "https://github.com/jaydenwindle/graphene-subscriptions"
+documentation = "https://github.com/Zadigo/kryptone/wiki"
+repository = "https://github.com/jaydenwindle/graphene-subscriptions"
+changelog = "https://github.com/Zadigo/kryptone/blob/main/CHANGELOG.md"
+
+[tool.poetry]
+
 
 [tool.poetry.dependencies]
 python = ">=3.6"
@@ -43,5 +53,5 @@ twine = "^3.1"
 tox = "^3.14"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=2.3.0"]
 build-backend = "poetry.masonry.api"

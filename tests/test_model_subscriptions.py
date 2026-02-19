@@ -8,9 +8,9 @@ from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 from graphene_django.settings import graphene_settings
 
-from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
-from graphene_subscriptions.events import SubscriptionEvent
-from graphene_subscriptions.signals import (
+from _graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
+from _graphene_subscriptions.events import SubscriptionEvent
+from _graphene_subscriptions.signals import (
     post_delete_subscription,
     post_save_subscription,
 )
